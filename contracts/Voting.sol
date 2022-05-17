@@ -24,6 +24,11 @@ contract Voting
 
     uint num = 0;           //number of elections
     Election[] public elections;
+
+    function getNum() external view returns(uint) 
+    {
+        return num;
+    }
     
     function createElection(bytes32[] calldata proposalNames, uint votingTime) external
     {

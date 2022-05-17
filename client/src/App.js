@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import SimpleStorageContract from "./contracts/Voting.json";
 import getWeb3 from "./getWeb3";
+
 import {
   BrowserRouter,
   Routes,
@@ -14,6 +15,8 @@ import Create from './Create';
 
 class App extends Component {
   state = { storageValue: 0, web3: null, accounts: null, contract: null };
+
+
 
   componentDidMount = async () => {
     try {
@@ -34,6 +37,20 @@ class App extends Component {
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
       this.setState({ web3, accounts, contract: instance }, this.runExample);
+      this.setState({account: accounts[0]});
+
+      const contract =  this.state.contract
+      const cnt = await contract.methods.getNum().call()
+      this.setState(cnt)
+      console.log(cnt)
+
+      for(var i = 1; i<=cnt;i++) {
+        const task = await contract.methods.elections(i).call
+        this.setState({
+          tasks: [...this.state.tasks, task]
+        })
+      }
+
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -42,6 +59,21 @@ class App extends Component {
       console.error(error);
     }
   };
+
+  constructor(props)
+  {
+    super(props)
+
+    this.state = {
+      
+    }
+
+    
+
+    this.addPoll = this.addPoll.bind(this)
+
+
+  }
 
   runExample = async () => {
     const { accounts, contract } = this.state;
@@ -56,23 +88,36 @@ class App extends Component {
     //this.setState({ storageValue: response });
   };
 
+  addPoll = async (poll) => {
+    
+
+  }
+
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     return (
       
-       <BrowserRouter>
+      <BrowserRouter>
         <div className="App">
+
           <NavBar />
-          <div className="content">
-            <Routes>
+
+          <p>Your account: {this.state.account}</p>
+
+          <Routes>
             <Route path="/" element={<Election />} />
             <Route path="/create" element={<Create />} />
-            </Routes>
+          </Routes>
+          
+
+          <div className="content">
+           
           </div>
         </div>
-      </BrowserRouter>
+
+        </BrowserRouter>
 
     );
   }
