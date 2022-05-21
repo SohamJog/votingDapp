@@ -25,10 +25,34 @@ contract Voting
     uint num = 0;           //number of elections
     Election[] public elections;
 
+    function isRunning(uint _electionId) public view returns(bool)
+    {
+        return (block.timestamp<=elections[_electionId].endTime);
+    }
+
+    function getTimeLeft(uint _electionId) public view returns (uint)
+    {
+        return (uint(elections[_electionId].endTime) - uint(block.timestamp));
+    }
+
     function getNum() external view returns(uint) 
     {
         return num;
     }
+
+    function getNumOfCandidates(uint _electionId) public view returns(uint) {
+        return elections[_electionId].candidates.length;
+    }
+
+    function getCandidate(uint _electionId, uint _candidateId) public view returns(bytes32) {
+        return elections[_electionId].candidates[_candidateId].name;
+    }
+
+    function getVotes(uint _electionId, uint _candidateId) public view returns(uint) {
+        return elections[_electionId].candidates[_candidateId].voteCount;
+    }
+
+    ////////
     
     function createElection(bytes32[] calldata proposalNames, uint votingTime) external
     {

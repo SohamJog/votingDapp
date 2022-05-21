@@ -29,27 +29,52 @@ class App extends Component {
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = SimpleStorageContract.networks[networkId];
+      this.setState({account: accounts[0]});
       const instance = new web3.eth.Contract(
         SimpleStorageContract.abi,
         deployedNetwork && deployedNetwork.address,
+        {from:this.state.account}
       );
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
       this.setState({ web3, accounts, contract: instance }, this.runExample);
-      this.setState({account: accounts[0]});
+      
 
       const contract =  this.state.contract
       const cnt = await contract.methods.getNum().call()
-      this.setState(cnt)
+      this.setState({cnt})
       console.log(cnt)
+      
+      let tempState = {candidates: [], time: 0}
+      this.setState ({elections: [tempState]});
+      
+      for(var i = 0; i<cnt;i++) {
+        const running = await contract.methods.isRunning(i).call()
+        if(!running)
+        {
+          continue;
+        }
+        const numCandidates = await contract.methods.getNumOfCandidates(i).call()
+        console.log(numCandidates)
+        let curr      //push in state
+        for(var j = 0;j<numCandidates;j++)
+        {
+          const candidateName = await contract.methods.getCandidate(i,j).call()
+          const candidateVotes = await contract.methods.getVotes(i,j).call()
+          
+          curr.push([candidateName, candidateVotes])
+        }
+        let timeLeft = await contract.methods.getTimeLeft(i).call()   //push in state
+        
+        //add chairperson or title feature later
+        
+        this.setState(
+          {elections: [...this.state.elections, {candidates: curr, time: timeLeft}]}
+        )
 
-      for(var i = 1; i<=cnt;i++) {
-        const task = await contract.methods.elections(i).call
-        this.setState({
-          tasks: [...this.state.tasks, task]
-        })
       }
+      
 
     } catch (error) {
       // Catch any errors for any of the above operations.
@@ -65,18 +90,49 @@ class App extends Component {
     super(props)
 
     this.state = {
-      
+      account: '',
+      elections: [],
+
     }
 
     
-
+    this.setAccount = this.setAccount.bind(this)
     this.addPoll = this.addPoll.bind(this)
+  }
 
+  setAccount = async() => {
+    const accounts = await this.state.web3.eth.getAccounts();
+    this.state.account = accounts[0]
+    
+  }
+  
+
+  addPoll = async (poll) => 
+  {
+    console.log("addpoll")
+    /*
+  poll = 
+  {
+    timeLeft: x
+    candidates: [c1 c2 ...]
+  }
+  */
+    //function createElection(bytes32[] calldata proposalNames, uint votingTime)
+    let temp = []
+    let timeLeft = poll.timeLeft
+    for(var i= 0;i<poll.candidates.length;i++)
+    {
+      temp.push(this.state.web3.utils.asciiToHex(poll.candidates[i]));
+    }
+    //edit edit
+    await this.state.contract.methods.createElection(temp, timeLeft).send()
 
   }
 
-  runExample = async () => {
+ runExample = async () => {
     const { accounts, contract } = this.state;
+    
+
 
     // Stores a given value, 5 by default.
     //await contract.methods.set(5).send({ from: accounts[0] });
@@ -88,10 +144,7 @@ class App extends Component {
     //this.setState({ storageValue: response });
   };
 
-  addPoll = async (poll) => {
-    
-
-  }
+ 
 
   render() {
     if (!this.state.web3) {
@@ -102,13 +155,19 @@ class App extends Component {
       <BrowserRouter>
         <div className="App">
 
-          <NavBar />
+          <NavBar  
+          setAccount = {this.setAccount}
+          account = {this.state.account}
+          />
 
-          <p>Your account: {this.state.account}</p>
+          
 
           <Routes>
             <Route path="/" element={<Election />} />
-            <Route path="/create" element={<Create />} />
+            <Route path="/create" element={<Create 
+              addPoll = {this.addPoll}
+              
+            />} />
           </Routes>
           
 

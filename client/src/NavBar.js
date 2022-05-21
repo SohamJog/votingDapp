@@ -1,16 +1,20 @@
 import React from 'react';
 
 
-const NavBar = () => {
+const NavBar = (props) => {
+
+    props.setAccount()
     return ( 
         <nav >
+
+            <p>Your account: {props.account}</p>
             <h1>Decentralized Polls</h1>
 
            
 
-            <a href="/">Home</a>
+            <span><a href="/">Home</a></span>
 
-            <a href="/create">New Poll</a>
+            <span><a href="/create">New Poll</a></span>
 
         </nav>
      );
