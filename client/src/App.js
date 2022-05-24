@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import SimpleStorageContract from "./contracts/Voting.json";
 import getWeb3 from "./getWeb3";
 
@@ -33,12 +33,12 @@ class App extends Component {
       const instance = new web3.eth.Contract(
         SimpleStorageContract.abi,
         deployedNetwork && deployedNetwork.address,
-        {from:this.state.account}
+        
       );
 
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.runExample);
+      this.setState({ web3, accounts, contract: instance });
       
 
       const contract =  this.state.contract
@@ -46,8 +46,14 @@ class App extends Component {
       this.setState({cnt})
       console.log(cnt)
       
-      let tempState = {candidates: [], time: 0}
-      this.setState ({elections: [tempState]});
+
+
+
+
+      
+     // let tempState = {candidates: [], time: 0}
+     let elec = []
+      this.setState ({elections: elec});
       
       for(var i = 0; i<cnt;i++) {
         const running = await contract.methods.isRunning(i).call()
@@ -56,14 +62,17 @@ class App extends Component {
           continue;
         }
         const numCandidates = await contract.methods.getNumOfCandidates(i).call()
-        console.log(numCandidates)
+
         let curr      //push in state
         for(var j = 0;j<numCandidates;j++)
         {
           const candidateName = await contract.methods.getCandidate(i,j).call()
           const candidateVotes = await contract.methods.getVotes(i,j).call()
+
+
+
           
-          curr.push([candidateName, candidateVotes])
+          curr.push({cname: candidateName, cvotes: candidateVotes})
         }
         let timeLeft = await contract.methods.getTimeLeft(i).call()   //push in state
         
@@ -72,6 +81,8 @@ class App extends Component {
         this.setState(
           {elections: [...this.state.elections, {candidates: curr, time: timeLeft}]}
         )
+
+        console.log(this.state.elections);
 
       }
       
@@ -85,20 +96,7 @@ class App extends Component {
     }
   };
 
-  constructor(props)
-  {
-    super(props)
-
-    this.state = {
-      account: '',
-      elections: [],
-
-    }
-
-    
-    this.setAccount = this.setAccount.bind(this)
-    this.addPoll = this.addPoll.bind(this)
-  }
+  
 
   setAccount = async() => {
     const accounts = await this.state.web3.eth.getAccounts();
@@ -125,24 +123,11 @@ class App extends Component {
       temp.push(this.state.web3.utils.asciiToHex(poll.candidates[i]));
     }
     //edit edit
-    await this.state.contract.methods.createElection(temp, timeLeft).send()
+    await this.state.contract.methods.createElection(temp, timeLeft).send({from:this.state.account, value: 0})
 
   }
 
- runExample = async () => {
-    const { accounts, contract } = this.state;
-    
 
-
-    // Stores a given value, 5 by default.
-    //await contract.methods.set(5).send({ from: accounts[0] });
-
-    // Get the value from the contract to prove it worked.
-    //const response = await contract.methods.get().call();
-
-    // Update state with the result.
-    //this.setState({ storageValue: response });
-  };
 
  
 
@@ -163,7 +148,9 @@ class App extends Component {
           
 
           <Routes>
-            <Route path="/" element={<Election />} />
+            <Route path="/" element={<Election
+              elections = {this.elections}
+            />} />
             <Route path="/create" element={<Create 
               addPoll = {this.addPoll}
               

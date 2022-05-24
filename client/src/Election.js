@@ -2,20 +2,15 @@ import React,{Component} from 'react';
 
 
 
-class Election extends Component{
+const Election = (props) => {
 
 
-   render()
-   {
     return ( 
-        <div>
+        <div >
+
 
         </div>
-        
-    );
-   }
-
-    
+     );
 }
  
 export default Election;
