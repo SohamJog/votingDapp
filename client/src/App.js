@@ -1,5 +1,7 @@
+
+
 import React, { Component, useState } from "react";
-import SimpleStorageContract from "./contracts/Voting.json";
+import Voting from "./contracts/Voting.json";
 import getWeb3 from "./getWeb3";
 
 import {
@@ -14,7 +16,7 @@ import Election from './Election';
 import Create from './Create';
 
 class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
+  state = { storageValue: 0, web3: null, accounts: null, contract: null, elections: [] };
 
 
 
@@ -28,10 +30,10 @@ class App extends Component {
 
       // Get the contract instance.
       const networkId = await web3.eth.net.getId();
-      const deployedNetwork = SimpleStorageContract.networks[networkId];
+      const deployedNetwork = Voting.networks[networkId];
       this.setState({account: accounts[0]});
       const instance = new web3.eth.Contract(
-        SimpleStorageContract.abi,
+       Voting.abi,
         deployedNetwork && deployedNetwork.address,
         
       );
@@ -47,35 +49,37 @@ class App extends Component {
       console.log(cnt)
       
 
-
-
-
-      
-     // let tempState = {candidates: [], time: 0}
-     let elec = []
-      this.setState ({elections: elec});
-      
       for(var i = 0; i<cnt;i++) {
-        const running = await contract.methods.isRunning(i).call()
+        const running =  await contract.methods.isRunning(i).call()
+
+        
         if(!running)
         {
           continue;
         }
-        const numCandidates = await contract.methods.getNumOfCandidates(i).call()
 
-        let curr      //push in state
+        
+        const numCandidates = await contract.methods.getNumOfCandidates(i).call()
+        
+        
+        
+        const curr = []      //push in state
         for(var j = 0;j<numCandidates;j++)
         {
-          const candidateName = await contract.methods.getCandidate(i,j).call()
+          const candidateName =  await contract.methods.getCandidate(i,j).call()
           const candidateVotes = await contract.methods.getVotes(i,j).call()
 
 
 
-          
-          curr.push({cname: candidateName, cvotes: candidateVotes})
+          const nem = web3.utils.hexToAscii(candidateName);
+          curr.push({cname: nem, cvotes: candidateVotes})
         }
-        let timeLeft = await contract.methods.getTimeLeft(i).call()   //push in state
+       
+        const timeLeft = await contract.methods.getTimeLeft(i).call()   //push in state
+
         
+
+
         //add chairperson or title feature later
         
         this.setState(
@@ -86,6 +90,13 @@ class App extends Component {
 
       }
       
+
+
+
+
+
+
+
 
     } catch (error) {
       // Catch any errors for any of the above operations.
@@ -107,14 +118,9 @@ class App extends Component {
 
   addPoll = async (poll) => 
   {
-    console.log("addpoll")
-    /*
-  poll = 
-  {
-    timeLeft: x
-    candidates: [c1 c2 ...]
-  }
-  */
+
+
+    
     //function createElection(bytes32[] calldata proposalNames, uint votingTime)
     let temp = []
     let timeLeft = poll.timeLeft
@@ -170,3 +176,47 @@ class App extends Component {
 }
 
 export default App;
+
+
+
+/*
+import React, { useEffect, useState } from 'react';
+import Voting from "./contracts/Voting.json";
+import getWeb3 from "./getWeb3";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+} from "react-router-dom";
+import "./App.css";
+import NavBar from './NavBar';
+import Election from './Election';
+import Create from './Create';
+
+function App() {
+  const [account, setAccount] = useState(); // state variable to set account.
+  
+  useEffect(() => {
+    async function load() {
+      const web3 = await getWeb3();
+
+      const accounts = await web3.eth.requestAccounts();
+      
+      setAccount(accounts[0]);
+    }
+    
+    load();
+   }, []);
+  
+   return (
+     <div>
+       Your account is: {account}
+     </div>
+   );
+}
+
+export default App;
+
+
+*/

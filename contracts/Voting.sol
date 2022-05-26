@@ -16,7 +16,7 @@ contract Voting
         uint endTime;                               //ending time
     }
 
-    mapping(uint => mapping(address => bool)) voted;
+   mapping(uint => mapping(address => bool)) voted;
    Candidate[][1e5] public candidates;
    // bytes32[][] public name;
    // uint[][] public votes;
@@ -30,7 +30,7 @@ contract Voting
         return (block.timestamp<=elections[_electionId].endTime);
     }
 
-    function getTimeLeft(uint _electionId) public view returns (uint)
+    function getTimeLeft(uint _electionId) external view returns (uint)
     {
         return (uint(elections[_electionId].endTime) - uint(block.timestamp));
     }
@@ -40,17 +40,17 @@ contract Voting
         return num;
     }
 
-    function getNumOfCandidates(uint _electionId) public view returns(uint) {
+    function getNumOfCandidates(uint _electionId) external view returns(uint) {
         return candidates[_electionId].length;
         //return votes[_electionId].length;
     }
 
-    function getCandidate(uint _electionId, uint _candidateId) public view returns(bytes32) {
+    function getCandidate(uint _electionId, uint _candidateId) external view returns(bytes32) {
         return candidates[_electionId][_candidateId].name;
         //return name[_electionId][_candidateId];
     }
 
-    function getVotes(uint _electionId, uint _candidateId) public view returns(uint) {
+    function getVotes(uint _electionId, uint _candidateId) external view returns(uint) {
         return candidates[_electionId][_candidateId].voteCount;
         //return votes[_electionId][_candidateId];
     }

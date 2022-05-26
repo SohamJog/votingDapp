@@ -11,12 +11,13 @@ const Create = (props) => {
 
 
     const handleSubmit = () => {
-        console.log("hello")
+        //console.log("hello")
         const temp = {timeLeft: 0, candidates: []}
         temp.timeLeft = time
         temp.candidates = [...candidates]
+        //console.log('temp', temp)
         setPoll(temp)
-        props.addPoll(poll)
+        props.addPoll(temp)
     }
     const handleTime = (event) => {
         const num = event.target.value
