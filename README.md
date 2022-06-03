@@ -15,3 +15,10 @@ You'll need:
 1. Metamask
 2. An account on the Rinkeby TestNet with Ether
 
+
+
+![Screen Shot 2022-06-03 at 5 03 40 PM](https://user-images.githubusercontent.com/34083543/171846193-dca72d8e-481b-4af6-ac99-32ba7328299e.png)
+
+
+![Screen Shot 2022-06-03 at 5 04 28 PM](https://user-images.githubusercontent.com/34083543/171846223-4ebf061d-1230-49e1-8d87-0282f2555a3a.png)
+
