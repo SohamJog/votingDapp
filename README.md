@@ -3,7 +3,9 @@
 A basic Dapp in which anyone can start a Poll for a finite amount of time. Anyone can vote in the voting period. One account can only vote once in a poll.
 
 This Dapp was deployed through Truffle. 
+
 The frontend is handled through React. You can find the frontend code in the client folder.
+
 The smart contract is deployed on the Rinkeby Test Network. You can find the smart contract in the contracts folder.
 
 
