@@ -1,4 +1,4 @@
-# votingDapp
+# Polling Dapp
  
 A basic Dapp in which anyone can start a Poll for a finite amount of time. Anyone can vote in the voting period. One account can only vote once in a poll.
 
